@@ -13,8 +13,5 @@
     "clipboardWrite",
     "tabs",
     "<all_urls>"
-  ],
-  "background": {
-    "scripts": ["background.js"]
-  }
+  ]
 }

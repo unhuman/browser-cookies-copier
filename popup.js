@@ -5,14 +5,34 @@ document.getElementById("saveAndCopyButton").addEventListener("click", function 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     var tabUrl = tabs[0].url;
     var domain = extractDomain(tabUrl);
-    chrome.runtime.sendMessage({
-      type: "storeCookie",
-      cookieName: cookieName,
-      tabDomain: domain,
+    getCookieValue(domain, cookieName, function (cookieValue) {
+      if (cookieValue) {
+        document.getElementById("cookieValue").value = cookieValue;
+        chrome.storage.local.get({ [domain]: {} }, function (result) {
+          result[domain].cookieName = cookieName;
+          chrome.storage.local.set(result, function () {
+            console.log(
+                "Cookie stored for " +
+                domain +
+                ": " +
+                cookieName +
+                "=" +
+                cookieValue
+            );
+            // Copy the cookie value to the clipboard
+            copyToClipboard(cookieValue);
+            document.getElementById("status").textContent = 'Copied!';
+          });
+        });
+      } else {
+        document.getElementById("cookieValue").value = '';
+        document.getElementById("status").textContent = 'Cookie Not Found!';
+
+        // The cookie was not found
+        console.log("Cookie not found: " + cookieName);
+      }
     });
   });
-  // Close the popup window
-  window.close();
 });
 
 function extractDomain(url) {
@@ -32,6 +52,45 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   chrome.storage.local.get({ [domain]: {} }, function (result) {
     if (result[domain].cookieName) {
       document.getElementById("cookieName").value = result[domain].cookieName;
+       getCookieValue(domain, result[domain].cookieName, function (cookieValue) {
+         if (cookieValue) {
+          document.getElementById("cookieValue").value = cookieValue;
+        }
+        });
     }
   });
 });
+
+
+function getCookieValue(domain, cookieName, callback) {
+  chrome.cookies.get({ url: "https://" + domain, name: cookieName }, function (cookie) {
+    if (cookie) {
+      callback(cookie.value);
+    } else {
+      var parentDomain = getParentDomain(domain);
+      if (parentDomain) {
+        getCookieValue(parentDomain, cookieName, callback);
+      } else {
+        callback(null);
+      }
+    }
+  });
+}
+
+function getParentDomain(domain) {
+  var domainParts = domain.split(".");
+  if (domainParts.length > 2) {
+    domainParts.shift();
+    return domainParts.join(".");
+  }
+  return null;
+}
+
+function copyToClipboard(text) {
+  const input = document.createElement("textarea");
+  document.body.appendChild(input);
+  input.value = text;
+  input.select();
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}
