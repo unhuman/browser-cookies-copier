@@ -1,35 +1,32 @@
 // Add a listener for when the Save and Copy button is clicked
 document.getElementById("saveAndCopyButton").addEventListener("click", function () {
-  var cookieName = document.getElementById("cookieName").value;
   // Send a message to the background script to store the cookie name and value in local storage
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     var tabUrl = tabs[0].url;
     var domain = extractDomain(tabUrl);
-    getCookieValue(domain, cookieName, function (cookieValue) {
-      if (cookieValue) {
-        document.getElementById("cookieValue").value = cookieValue;
+    getCookiesValue(domain, function (cookiesValue) {
+      if (cookiesValue) {
+        document.getElementById("cookiesValue").value = cookiesValue;
         chrome.storage.local.get({ [domain]: {} }, function (result) {
-          result[domain].cookieName = cookieName;
+          result[domain].cookiesName = 'cookies';
           chrome.storage.local.set(result, function () {
             console.log(
-                "Cookie stored for " +
+                "Cookies stored for " +
                 domain +
-                ": " +
-                cookieName +
                 "=" +
-                cookieValue
+                cookiesValue
             );
             // Copy the cookie value to the clipboard
-            copyToClipboard(cookieValue);
+            copyToClipboard(cookiesValue);
             document.getElementById("status").textContent = 'Copied!';
           });
         });
       } else {
-        document.getElementById("cookieValue").value = '';
+        document.getElementById("cookiesValue").value = '';
         document.getElementById("status").textContent = 'Cookie Not Found!';
 
         // The cookie was not found
-        console.log("Cookie not found: " + cookieName);
+        console.log("Cookies not found");
       }
     });
   });
@@ -52,9 +49,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   chrome.storage.local.get({ [domain]: {} }, function (result) {
     if (result[domain].cookieName) {
       document.getElementById("cookieName").value = result[domain].cookieName;
-       getCookieValue(domain, result[domain].cookieName, function (cookieValue) {
-         if (cookieValue) {
-          document.getElementById("cookieValue").value = cookieValue;
+       getCookieValue(domain, result[domain].cookieName, function (cookiesValue) {
+         if (cookiesValue) {
+          document.getElementById("cookiesValue").value = cookiesValue;
         }
         });
     }
@@ -62,14 +59,17 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 
-function getCookieValue(domain, cookieName, callback) {
-  chrome.cookies.get({ url: "https://" + domain, name: cookieName }, function (cookie) {
-    if (cookie) {
-      callback(cookie.value);
+function getCookiesValue(domain, callback) {
+  chrome.cookies.getAll({ 'domain': domain }, function (cookies) {
+    if (cookies) {
+      console.log("Raw " + cookies);
+      let values = cookies.map((cookie) => cookie.name + "=" + cookie.value).join('; ');  
+      console.log("joined: " + values);
+      callback(values);
     } else {
       var parentDomain = getParentDomain(domain);
       if (parentDomain) {
-        getCookieValue(parentDomain, cookieName, callback);
+        getCookieValue(parentDomain, callback);
       } else {
         callback(null);
       }
