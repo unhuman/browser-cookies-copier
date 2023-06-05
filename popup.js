@@ -1,23 +1,20 @@
-// Add a listener for when the Save and Copy button is clicked
-document.getElementById("saveAndCopyButton").addEventListener("click", function () {
-  // Send a message to the background script to store the cookie name and value in local storage
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    var tabUrl = tabs[0].url;
-    var domain = extractDomain(tabUrl);
-    getCookiesValue(domain, function (cookiesValue) {
-      if (cookiesValue) {
-         document.getElementById("cookiesValue").value = cookiesValue;
-         // Copy the cookie value to the clipboard
-         copyToClipboard(cookiesValue);
-         document.getElementById("status").textContent = 'Copied!';
-      } else {
-        document.getElementById("cookiesValue").value = '';
-        document.getElementById("status").textContent = 'Cookie Not Found!';
+// Send a message to the background script to store the cookie name and value in local storage
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  var tabUrl = tabs[0].url;
+  var domain = extractDomain(tabUrl);
+  getCookiesValue(domain, function (cookiesValue) {
+    if (cookiesValue) {
+       document.getElementById("cookiesValue").value = cookiesValue;
+       // Copy the cookie value to the clipboard
+       copyToClipboard(cookiesValue);
+       document.getElementById("status").textContent = 'Copied!';
+    } else {
+      document.getElementById("cookiesValue").value = '';
+      document.getElementById("status").textContent = 'Cookie Not Found!';
 
-        // The cookie was not found
-        console.log("Cookies not found");
-      }
-    });
+      // The cookie was not found
+      console.log("Cookies not found");
+    }
   });
 });
 
