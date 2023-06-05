@@ -6,21 +6,10 @@ document.getElementById("saveAndCopyButton").addEventListener("click", function 
     var domain = extractDomain(tabUrl);
     getCookiesValue(domain, function (cookiesValue) {
       if (cookiesValue) {
-        document.getElementById("cookiesValue").value = cookiesValue;
-        chrome.storage.local.get({ [domain]: {} }, function (result) {
-          result[domain].cookiesName = 'cookies';
-          chrome.storage.local.set(result, function () {
-            console.log(
-                "Cookies stored for " +
-                domain +
-                "=" +
-                cookiesValue
-            );
-            // Copy the cookie value to the clipboard
-            copyToClipboard(cookiesValue);
-            document.getElementById("status").textContent = 'Copied!';
-          });
-        });
+         document.getElementById("cookiesValue").value = cookiesValue;
+         // Copy the cookie value to the clipboard
+         copyToClipboard(cookiesValue);
+         document.getElementById("status").textContent = 'Copied!';
       } else {
         document.getElementById("cookiesValue").value = '';
         document.getElementById("status").textContent = 'Cookie Not Found!';
@@ -41,23 +30,6 @@ function extractDomain(url) {
   }
   return domain.split(":")[0];
 }
-
-// Set the Cookie Name text box value to the last stored cookie name for the current domain
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-  var tabUrl = tabs[0].url;
-  var domain = extractDomain(tabUrl);
-  chrome.storage.local.get({ [domain]: {} }, function (result) {
-    if (result[domain].cookieName) {
-      document.getElementById("cookieName").value = result[domain].cookieName;
-       getCookieValue(domain, result[domain].cookieName, function (cookiesValue) {
-         if (cookiesValue) {
-          document.getElementById("cookiesValue").value = cookiesValue;
-        }
-        });
-    }
-  });
-});
-
 
 function getCookiesValue(domain, callback) {
   chrome.cookies.getAll({ 'domain': domain }, function (cookies) {

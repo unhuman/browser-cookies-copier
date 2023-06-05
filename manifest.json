@@ -9,7 +9,6 @@
   },
   "permissions": [
     "cookies",
-    "storage",
     "clipboardWrite",
     "tabs",
     "<all_urls>"
