@@ -3,7 +3,7 @@ Browser extension to copy all cookies - tested on Firefox, should also work on C
 
 ### forked from https://github.com/xuan-yuan-frank/cookie-copier
 
-## Installation
+## Installation - Temporary
 ### Firefox
 1. Go to "about:config"
 1. Click on "This Firefox"
