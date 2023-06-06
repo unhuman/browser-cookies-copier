@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Cookie Copier",
+  "name": "Browser Cookie Copier",
   "version": "1.0",
-  "description": "A Chrome extension to save and copy cookies.",
+  "description": "A web browser extension to save and copy cookies.",
   "browser_action": {
     "default_popup": "popup.html",
     "default_title": "Cookie Copier"
