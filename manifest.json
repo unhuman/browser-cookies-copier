@@ -7,6 +7,9 @@
     "default_popup": "popup.html",
     "default_title": "Cookie Copier"
   },
+  "icons": {
+    "48": "icons/cookies-48.png"
+  },
   "permissions": [
     "cookies",
     "clipboardWrite",
