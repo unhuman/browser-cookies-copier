@@ -10,4 +10,6 @@ Browser extension to copy all cookies - tested on Firefox, should also work on C
 1. Click on "Load Temporary Add-on"
 1. Navigate to the directory and pick any file
 
-
+## Installation - Permanent
+### Firefox
+1. Find xpi file in releases/ directory
